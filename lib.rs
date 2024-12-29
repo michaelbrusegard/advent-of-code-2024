@@ -1,5 +1,26 @@
 use std::fs::File;
 use std::io::{self, BufRead};
+use std::str::FromStr;
+use std::time::Instant;
+
+pub struct Timer {
+    start: Instant,
+}
+
+impl Default for Timer {
+    fn default() -> Self {
+        Self {
+            start: Instant::now(),
+        }
+    }
+}
+
+impl Drop for Timer {
+    fn drop(&mut self) {
+        let elapsed = self.start.elapsed();
+        println!("Time: {:?}", elapsed);
+    }
+}
 
 pub fn read_lines(filename: &str) -> io::Result<Vec<String>> {
     let file = File::open(filename)?;
@@ -11,4 +32,14 @@ pub fn read_lines(filename: &str) -> io::Result<Vec<String>> {
     }
 
     Ok(lines)
+}
+
+pub fn parse_numbers<T>(line: &str) -> Vec<T>
+where
+    T: FromStr,
+    <T as FromStr>::Err: std::fmt::Debug,
+{
+    line.split_whitespace()
+        .map(|s| s.parse().unwrap())
+        .collect()
 }

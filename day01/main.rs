@@ -1,13 +1,18 @@
-use advent_of_code_2024::read_lines;
+use advent_of_code_2024::{parse_numbers, read_lines, Timer};
 
 fn main() {
     let (mut list1, list2) = parse_input("day01/input.txt");
-    let total_distance = calculate_distance(&list1, &list2);
-    println!("Total distance: {}", total_distance);
-
-    list1.dedup();
-    let similarity_score = calculate_similarity(&list1, &list2);
-    println!("Similarity score: {}", similarity_score);
+    {
+        let _timer = Timer::default();
+        let total_distance = calculate_distance(&list1, &list2);
+        println!("Total distance: {}", total_distance);
+    }
+    {
+        let _timer = Timer::default();
+        list1.dedup();
+        let similarity_score = calculate_similarity(&list1, &list2);
+        println!("Similarity score: {}", similarity_score);
+    }
 }
 
 fn parse_input(filename: &str) -> (Vec<i32>, Vec<i32>) {
@@ -27,12 +32,9 @@ fn parse_input(filename: &str) -> (Vec<i32>, Vec<i32>) {
 }
 
 fn parse_line(line: &str) -> Option<(i32, i32)> {
-    let mut numbers = line
-        .split_whitespace()
-        .filter_map(|s| s.parse::<i32>().ok());
-
-    match (numbers.next(), numbers.next()) {
-        (Some(n1), Some(n2)) => Some((n1, n2)),
+    let numbers = parse_numbers::<i32>(line);
+    match (numbers.get(0), numbers.get(1)) {
+        (Some(&n1), Some(&n2)) => Some((n1, n2)),
         _ => None,
     }
 }
