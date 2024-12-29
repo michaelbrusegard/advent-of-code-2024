@@ -1,9 +1,13 @@
 use advent_of_code_2024::read_lines;
 
 fn main() {
-    let (list1, list2) = parse_input("day01/input.txt");
+    let (mut list1, list2) = parse_input("day01/input.txt");
     let total_distance = calculate_distance(&list1, &list2);
     println!("Total distance: {}", total_distance);
+
+    list1.dedup();
+    let similarity_score = calculate_similarity(&list1, &list2);
+    println!("Similarity score: {}", similarity_score);
 }
 
 fn parse_input(filename: &str) -> (Vec<i32>, Vec<i32>) {
@@ -42,4 +46,18 @@ fn calculate_distance(list1: &[i32], list2: &[i32]) -> i32 {
         total_distance += distance;
     }
     total_distance
+}
+
+fn calculate_similarity(list1: &[i32], list2: &[i32]) -> i32 {
+    let mut total_similarity = 0;
+    for num in list1 {
+        let count: i32 = list2
+            .iter()
+            .filter(|&&x| x == *num)
+            .count()
+            .try_into()
+            .unwrap_or(0);
+        total_similarity += num * count;
+    }
+    total_similarity
 }
