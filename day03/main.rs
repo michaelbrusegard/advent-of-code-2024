@@ -5,18 +5,24 @@ fn main() {
     let strings = read_lines("day03/input.txt").expect("Failed to read file");
     {
         let _timer = Timer::default();
-        let operations = get_operations(strings);
+        let operations = get_operations(&strings);
+        let result = calculate_result(operations);
+        println!("Operations result: {}", result);
+    }
+    {
+        let _timer = Timer::default();
+        let operations = get_operations_with_statements(&strings);
         let result = calculate_result(operations);
         println!("Operations result: {}", result);
     }
 }
 
-fn get_operations(strings: Vec<String>) -> Vec<(i32, i32)> {
+fn get_operations(strings: &[String]) -> Vec<(i32, i32)> {
     let mut operations = Vec::new();
     let re = Regex::new(r"mul\((\d+),(\d+)\)").unwrap();
 
     for string in strings {
-        for cap in re.captures_iter(&string) {
+        for cap in re.captures_iter(string) {
             let x: i32 = cap[1].parse().unwrap();
             let y: i32 = cap[2].parse().unwrap();
             operations.push((x, y));
@@ -33,3 +39,5 @@ fn calculate_result(operations: Vec<(i32, i32)>) -> i32 {
 
     result
 }
+
+fn get_operations_with_statements(strings: &[String]) -> Vec<(i32, i32)> {}
