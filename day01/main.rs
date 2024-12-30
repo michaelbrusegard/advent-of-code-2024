@@ -33,7 +33,7 @@ fn parse_input(filename: &str) -> (Vec<i32>, Vec<i32>) {
 
 fn parse_line(line: &str) -> Option<(i32, i32)> {
     let numbers = parse_numbers::<i32>(line);
-    match (numbers.get(0), numbers.get(1)) {
+    match (numbers.first(), numbers.get(1)) {
         (Some(&n1), Some(&n2)) => Some((n1, n2)),
         _ => None,
     }
