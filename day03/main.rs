@@ -13,7 +13,7 @@ fn main() {
         let _timer = Timer::default();
         let operations = get_operations_with_statements(&string);
         let result = calculate_result(operations);
-        println!("Operations result: {}", result);
+        println!("Operations with statements result: {}", result);
     }
 }
 
@@ -38,34 +38,24 @@ fn calculate_result(operations: Vec<(i32, i32)>) -> i32 {
     result
 }
 
-fn get_operations_with_statements(input: &str) -> Vec<(i32, i32)> {
+fn get_operations_with_statements(string: &str) -> Vec<(i32, i32)> {
     let mut operations = Vec::new();
+    let re = Regex::new(r"mul\((\d+),(\d+)\)|do\(\)|don't\(\)").unwrap();
     let mul_re = Regex::new(r"mul\((\d+),(\d+)\)").unwrap();
     let do_re = Regex::new(r"do\(\)").unwrap();
     let dont_re = Regex::new(r"don't\(\)").unwrap();
     let mut processing = true;
-    let mut current_pos = 0;
 
-    while current_pos < input.len() {
-        let remaining = &input[current_pos..];
-
-        if let Some(do_match) = do_re.find(remaining) {
-            processing = true;
-            current_pos += do_match.end();
-        } else if let Some(dont_match) = dont_re.find(remaining) {
+    for cap in re.captures_iter(string) {
+        let matched = cap.get(0).unwrap().as_str();
+        if dont_re.is_match(matched) {
             processing = false;
-            current_pos += dont_match.end();
-        } else if let Some(mul_match) = mul_re.find(remaining) {
-            if processing {
-                if let Some(cap) = mul_re.captures(&remaining[mul_match.start()..mul_match.end()]) {
-                    let x: i32 = cap[1].parse().unwrap();
-                    let y: i32 = cap[2].parse().unwrap();
-                    operations.push((x, y));
-                }
-            }
-            current_pos += mul_match.end();
-        } else {
-            current_pos += 1;
+        } else if do_re.is_match(matched) {
+            processing = true;
+        } else if mul_re.is_match(matched) && processing {
+            let x: i32 = mul_re.captures(matched).unwrap()[1].parse().unwrap();
+            let y: i32 = mul_re.captures(matched).unwrap()[2].parse().unwrap();
+            operations.push((x, y));
         }
     }
 
