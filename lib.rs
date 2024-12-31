@@ -34,6 +34,10 @@ pub fn read_lines(filename: &str) -> io::Result<Vec<String>> {
     Ok(lines)
 }
 
+pub fn read_to_string(filename: &str) -> io::Result<String> {
+    std::fs::read_to_string(filename)
+}
+
 pub fn parse_numbers<T>(line: &str) -> Vec<T>
 where
     T: FromStr,
