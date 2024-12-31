@@ -1,8 +1,8 @@
-use advent_of_code_2024::{read_to_string, Timer};
+use advent_of_code_2024::{parse_to_string, Timer};
 use regex::Regex;
 
 fn main() {
-    let string = read_to_string("day03/input.txt").expect("Failed to read file");
+    let string = parse_to_string("day03/input.txt");
     {
         let _timer = Timer::default();
         let operations = get_operations(&string);

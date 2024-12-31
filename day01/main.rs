@@ -1,7 +1,7 @@
-use advent_of_code_2024::{parse_numbers, read_lines, Timer};
+use advent_of_code_2024::{parse_to_lines, Timer};
 
 fn main() {
-    let (mut list1, list2) = parse_input("day01/input.txt");
+    let (mut list1, list2) = parse_to_two_number_lists("day01/input.txt");
     {
         let _timer = Timer::default();
         let total_distance = calculate_distance(&list1, &list2);
@@ -15,12 +15,17 @@ fn main() {
     }
 }
 
-fn parse_input(filename: &str) -> (Vec<i32>, Vec<i32>) {
+fn parse_to_two_number_lists(filename: &str) -> (Vec<i32>, Vec<i32>) {
     let mut list1 = Vec::new();
     let mut list2 = Vec::new();
 
-    for line in read_lines(filename).expect("Failed to read file") {
-        if let Some((num1, num2)) = parse_line(&line) {
+    for line in parse_to_lines(filename) {
+        let numbers: Vec<i32> = line
+            .split_whitespace()
+            .filter_map(|s| s.parse().ok())
+            .collect();
+
+        if let (Some(&num1), Some(&num2)) = (numbers.first(), numbers.get(1)) {
             list1.push(num1);
             list2.push(num2);
         }
@@ -29,14 +34,6 @@ fn parse_input(filename: &str) -> (Vec<i32>, Vec<i32>) {
     list1.sort();
     list2.sort();
     (list1, list2)
-}
-
-fn parse_line(line: &str) -> Option<(i32, i32)> {
-    let numbers = parse_numbers::<i32>(line);
-    match (numbers.first(), numbers.get(1)) {
-        (Some(&n1), Some(&n2)) => Some((n1, n2)),
-        _ => None,
-    }
 }
 
 fn calculate_distance(list1: &[i32], list2: &[i32]) -> i32 {

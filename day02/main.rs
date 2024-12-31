@@ -1,7 +1,7 @@
-use advent_of_code_2024::{read_lines, Timer};
+use advent_of_code_2024::{parse_to_number_grid, Timer};
 
 fn main() {
-    let reports = parse_input("day02/input.txt");
+    let reports = parse_to_number_grid("day02/input.txt");
     {
         let _timer = Timer::default();
         let safe_reports = calculate_safe_reports(&reports);
@@ -12,22 +12,6 @@ fn main() {
         let safe_reports_with_dampener = calculate_safe_reports_with_dampener(&reports);
         println!("Safe reports with dampener: {}", safe_reports_with_dampener);
     }
-}
-
-fn parse_input(filename: &str) -> Vec<Vec<i32>> {
-    let mut list = Vec::new();
-
-    for line in read_lines(filename).expect("Failed to read file") {
-        list.push(parse_line(&line));
-    }
-
-    list
-}
-
-fn parse_line(line: &str) -> Vec<i32> {
-    line.split_whitespace()
-        .map(|s| s.parse().unwrap())
-        .collect()
 }
 
 fn is_sequence_safe(sequence: &[i32]) -> bool {
