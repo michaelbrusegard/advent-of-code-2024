@@ -11,6 +11,15 @@ fn main() {
             correctly_ordered_updates_sum
         );
     }
+    {
+        let _timer = Timer::default();
+        let incorrect_ordered_updates_sum =
+            calculate_incorrectly_ordered_updates_sum(&rules, &updates);
+        println!(
+            "Incorrect ordered updates middle sum: {}",
+            incorrect_ordered_updates_sum
+        );
+    }
 }
 
 fn parse_rules_and_updates(filename: &str) -> (Vec<(i32, i32)>, Vec<Vec<i32>>) {
@@ -71,6 +80,40 @@ fn calculate_correctly_ordered_updates_sum(rules: &[(i32, i32)], updates: &[Vec<
         }
 
         if valid {
+            sum += update[update.len() / 2];
+        }
+    }
+
+    sum
+}
+
+fn calculate_incorrectly_ordered_updates_sum(rules: &[(i32, i32)], updates: &[Vec<i32>]) -> i32 {
+    let mut sum = 0;
+
+    for update in updates {
+        let mut valid_rules = Vec::new();
+        for rule in rules {
+            if update.contains(&rule.0) && update.contains(&rule.1) {
+                valid_rules.push(rule);
+            }
+        }
+
+        if valid_rules.is_empty() {
+            continue;
+        }
+
+        let mut valid = true;
+        for (i, &current) in update.iter().enumerate() {
+            for rule in &valid_rules {
+                if rule.1 == current {
+                    if let Some(j) = update.iter().position(|&x| x == rule.0) {
+                        valid = false;
+                    }
+                }
+            }
+        }
+
+        if !valid {
             sum += update[update.len() / 2];
         }
     }
