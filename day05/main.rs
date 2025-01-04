@@ -1,4 +1,5 @@
 use advent_of_code_2024::{parse_to_lines, Timer};
+use std::collections::HashSet;
 
 fn main() {
     let (rules, updates) = parse_rules_and_updates("day05/input.txt");
@@ -50,14 +51,28 @@ fn parse_rules_and_updates(filename: &str) -> (Vec<(i32, i32)>, Vec<Vec<i32>>) {
     (rules, updates)
 }
 
+fn is_update_invalid(update: &[i32], valid_rules: &[(i32, i32)]) -> bool {
+    let mut valid = true;
+    for (i, &current) in update.iter().enumerate() {
+        for rule in valid_rules {
+            if rule.1 == current && !update.iter().take(i).any(|&page| page == rule.0) {
+                valid = false;
+                break;
+            }
+        }
+    }
+
+    valid
+}
+
 fn calculate_correctly_ordered_updates_sum(rules: &[(i32, i32)], updates: &[Vec<i32>]) -> i32 {
     let mut sum = 0;
 
     for update in updates {
-        let mut valid_rules = Vec::new();
+        let mut valid_rules: Vec<(i32, i32)> = Vec::new();
         for rule in rules {
             if update.contains(&rule.0) && update.contains(&rule.1) {
-                valid_rules.push(rule);
+                valid_rules.push(*rule);
             }
         }
 
@@ -66,20 +81,7 @@ fn calculate_correctly_ordered_updates_sum(rules: &[(i32, i32)], updates: &[Vec<
             continue;
         }
 
-        let mut valid = true;
-        for (i, &current) in update.iter().enumerate() {
-            for rule in &valid_rules {
-                if rule.1 == current && !update.iter().take(i).any(|&page| page == rule.0) {
-                    valid = false;
-                    break;
-                }
-            }
-            if !valid {
-                break;
-            }
-        }
-
-        if valid {
+        if is_update_invalid(update, &valid_rules) {
             sum += update[update.len() / 2];
         }
     }
@@ -87,35 +89,42 @@ fn calculate_correctly_ordered_updates_sum(rules: &[(i32, i32)], updates: &[Vec<
     sum
 }
 
+fn dfs(num: i32, rules: &[(i32, i32)], visited: &mut HashSet<i32>, sorted: &mut Vec<i32>) {
+    visited.insert(num);
+    for rule in rules {
+        if rule.0 == num && !visited.contains(&rule.1) {
+            dfs(rule.1, rules, visited, sorted);
+        }
+    }
+    sorted.push(num);
+}
+
 fn calculate_incorrectly_ordered_updates_sum(rules: &[(i32, i32)], updates: &[Vec<i32>]) -> i32 {
     let mut sum = 0;
 
     for update in updates {
-        let mut valid_rules = Vec::new();
+        let mut valid_rules: Vec<(i32, i32)> = Vec::new();
         for rule in rules {
             if update.contains(&rule.0) && update.contains(&rule.1) {
-                valid_rules.push(rule);
+                valid_rules.push(*rule);
             }
         }
-
         if valid_rules.is_empty() {
             continue;
         }
+        if is_update_invalid(update, &valid_rules) {
+            continue;
+        }
+        let mut visited: HashSet<i32> = HashSet::new();
+        let mut sorted: Vec<i32> = Vec::new();
 
-        let mut valid = true;
-        for (i, &current) in update.iter().enumerate() {
-            for rule in &valid_rules {
-                if rule.1 == current {
-                    if let Some(j) = update.iter().position(|&x| x == rule.0) {
-                        valid = false;
-                    }
-                }
+        for &num in update {
+            if !visited.contains(&num) {
+                dfs(num, &valid_rules, &mut visited, &mut sorted);
             }
         }
 
-        if !valid {
-            sum += update[update.len() / 2];
-        }
+        sum += sorted[sorted.len() / 2];
     }
 
     sum
